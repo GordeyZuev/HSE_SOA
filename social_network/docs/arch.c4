@@ -1,0 +1,96 @@
+specification {
+    element person {
+        style {
+            shape person
+            color green
+        }
+    }
+    element softwareSystem
+    element container
+    element component
+}
+
+model {
+  user = person "Пользователь" "Пользователь социальной сети"
+
+  socialNetwork = softwareSystem "Social Network" {
+    apiGateway = container "API Gateway" {
+      description "Принимает все запросы от UI и направляет их в соответствующие сервисы"
+      technology "Python, FastAPI"
+    }
+
+    userService = container "User Service" {
+      description "Управление пользователями, аутентификация и авторизация"
+      technology "Python, FastAPI"
+      
+      component authController "Auth Controller" "Обрабатывает регистрацию и аутентификацию"
+      component userController "User Controller" "Управление профилями пользователей"
+      component roleController "Role Controller" "Управление ролями и правами"
+      component userRepository "User Repository" "PostgreSQL"
+    }
+
+    postService = container "Post Service" {
+      description "Управление постами, комментариями и лентой"
+      technology "Python, FastAPI"
+      
+      component postController "Post Controller" "CRUD операции с постами"
+      component commentController "Comment Controller" "Управление комментариями"
+      component feedController "Feed Controller" "Формирование ленты пользователя"
+      component postRepository "Post Repository" "PostgreSQL"
+    }
+
+    statsService = container "Stats Service" {
+      description "Сбор и анализ статистики (лайки, просмотры, комментарии)"
+      technology "Python, FastAPI"
+      
+      component statsController "Stats Controller" "Предоставление статистики"
+      component eventProcessor "Event Processor" "Обработка событий"
+      component statsRepository "Stats Repository" "ClickHouse"
+    }
+
+    postgresUsers = container "PostgreSQL (Users)" {
+      description "Хранение данных пользователей"
+      technology "Database"
+      style { shape cylinder }
+    }
+
+    postgresPosts = container "PostgreSQL (Posts)" {
+      description "Хранение постов и комментариев"
+      technology "Database"
+      style { shape cylinder }
+    }
+
+    clickhouse = container "ClickHouse" {
+      description "Хранение статистики"
+      technology "Database"
+      style { shape cylinder }
+    }
+
+    kafka = container "Kafka" {
+      description "Брокер сообщений для событий"
+      technology "Message Broker"
+      style { shape queue }
+    }
+  }
+
+  // Связи
+  user -> socialNetwork.apiGateway "Использует" "HTTPS"
+  
+  socialNetwork.apiGateway -> socialNetwork.userService "Маршрутизирует запросы" "HTTP"
+  socialNetwork.apiGateway -> socialNetwork.postService "Маршрутизирует запросы" "HTTP"
+  socialNetwork.apiGateway -> socialNetwork.statsService "Запрашивает статистику" "HTTP"
+
+  socialNetwork.userService -> socialNetwork.postgresUsers "Читает/пишет" "SQL"
+  socialNetwork.postService -> socialNetwork.postgresPosts "Читает/пишет" "SQL"
+  socialNetwork.statsService -> socialNetwork.clickhouse "Читает/пишет" "SQL"
+
+  socialNetwork.userService -> socialNetwork.kafka "Публикует user_events"
+  socialNetwork.postService -> socialNetwork.kafka "Публикует post_events, comment_events"
+  socialNetwork.statsService -> socialNetwork.kafka"Подписан на события"
+}
+
+views {
+   view index {
+        include *
+    }
+}
