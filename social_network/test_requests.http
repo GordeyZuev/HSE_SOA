@@ -1,0 +1,164 @@
+### Тестовые запросы для проверки API
+### Используйте эти запросы для тестирования функционала
+
+### 1. Проверка здоровья API Gateway
+GET http://localhost:8000/health
+
+### 2. Проверка здоровья User Service
+GET http://localhost:8001/health
+
+### 3. Регистрация нового пользователя
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "john_doe",
+    "password": "securepassword123",
+    "email": "john.doe@example.com"
+}
+
+### 4. Попытка регистрации с дублирующимся username
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "john_doe",
+    "password": "anotherpassword",
+    "email": "another@example.com"
+}
+
+### 5. Попытка регистрации с дублирующимся email
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "jane_doe",
+    "password": "anotherpassword",
+    "email": "john.doe@example.com"
+}
+
+### 6. Регистрация второго пользователя
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "jane_smith",
+    "password": "janespassword123",
+    "email": "jane.smith@example.com"
+}
+
+### 7. Аутентификация пользователя по username
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "username": "john_doe",
+    "password": "securepassword123"
+}
+
+### 8. Аутентификация пользователя по email
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "username": "jane.smith@example.com",
+    "password": "janespassword123"
+}
+
+### 9. Попытка аутентификации с неправильным паролем
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "username": "john_doe",
+    "password": "wrongpassword"
+}
+
+### 10. Получение профиля пользователя (замените TOKEN на реальный токен из ответа на запрос 7)
+GET http://localhost:8000/profile
+Authorization: Bearer TOKEN
+
+### 11. Обновление профиля пользователя (замените TOKEN на реальный токен)
+PUT http://localhost:8000/profile
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+    "first_name": "John",
+    "last_name": "Doe",
+    "birth_date": "1990-01-01",
+    "phone": "+1234567890"
+}
+
+### 12. Частичное обновление профиля (замените TOKEN на реальный токен)
+PUT http://localhost:8000/profile
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+    "phone": "+9876543210"
+}
+
+### 13. Получение списка всех пользователей
+GET http://localhost:8000/users
+
+### 14. Попытка получения профиля без токена
+GET http://localhost:8000/profile
+
+### 15. Попытка обновления профиля без токена
+PUT http://localhost:8000/profile
+Content-Type: application/json
+
+{
+    "first_name": "Test"
+}
+
+### 16. Тест валидации - слишком короткий username
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "ab",
+    "password": "securepassword123",
+    "email": "test@example.com"
+}
+
+### 17. Тест валидации - слишком короткий пароль
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "123",
+    "email": "test@example.com"
+}
+
+### 18. Тест валидации - невалидный email
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "securepassword123",
+    "email": "invalid-email"
+}
+
+### 19. Тест валидации - отсутствующие поля
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "testuser"
+}
+
+### 20. Проверка OpenAPI документации
+GET http://localhost:8000/docs
+
+### 21. Проверка OpenAPI схемы
+GET http://localhost:8000/openapi.json
+
+### 22. Проверка OpenAPI документации User Service
+GET http://localhost:8001/docs
+
+### 23. Проверка OpenAPI схемы User Service
+GET http://localhost:8001/openapi.json
